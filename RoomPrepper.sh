@@ -161,6 +161,48 @@ echo "--> screenshots folder created ..."
 
 
 #
+# Check if user wants to do a Gobuster scan, otherwise skip this section.
+#
+
+read -p "Do you want to do a gobuster scan? " g_choice
+if [[ $g_choice =~ ^[Yy]$ ]] 
+    then
+    read -p "What port do you want to scan? " R_PORT
+    echo "Using SecLists Raft as default..."
+    echo
+    echo "Checking installation..."
+    
+    echo ""
+    echo -e "\n"
+    echo -e "${YELLOW}------------------------------------${NC}"
+    echo -e "${YELLOW}-  Starting standard Gobuster Scan -${NC}"
+    echo -e "${YELLOW}------------------------------------${NC}"
+    echo -e "\n"
+    
+    if ! [ -x "$(command -v gobuster)" ]; then
+        echo -e "\n"
+        echo -e "${RED}------------------------------------${NC}"
+        echo -e "${RED}-      Gobuster not installed      -${NC}"
+        echo -e "${RED}------------------------------------${NC}"
+        echo -e "\n"
+        exit 0
+    else
+        echo "Making the directories..."
+        sleep 1
+        mkdir $BOXDIR_GLOBAL/gobusted
+        echo "Creating SecLists to use..."
+        sleep 1
+        git clone https://github.com/danielmiessler/SecLists.git $BOXDIR_GLOBAL/gobusted/
+        echo "Starting scan on http://$IP:$R_PORT..."
+        sleep 2
+        gobuster dir -u http://$IP:R_PORT -w $BOXDIR_GLOBAL/gobusted/Seclists/Discivery/Web-Content/raft-medium-directories-lowercase.txt
+        
+    fi
+else
+exit 0
+fi
+
+#
 # Ping host to check if it is alive, if not (typo i.e.) try again with same or other IP
 #
 
